@@ -44,12 +44,21 @@ body {
     color: white;
     background: #334155;
     font-weight: 500;
+    transition: 0.2s;
+}
+
+.button:hover {
+    background: #475569;
 }
 
 .button.primary {
     background: #22c55e;
     color: black;
     font-weight: 600;
+}
+
+.button.primary:hover {
+    background: #16a34a;
 }
 
 .key {
@@ -59,7 +68,6 @@ body {
     font-size: 12px;
     word-break: break-all;
     margin-top: 10px;
-    opacity: 0.7;
 }
 
 .hidden {
@@ -81,33 +89,28 @@ body {
 <div class="title">⚡ SELLPRIM VPN</div>
 
 <div class="card">
-    🔑 Подключение...
-    <div id="key" class="key hidden"></div>
+    🔑 Подключение к VPN...
 </div>
 
-<div id="fallback" class="hidden">
+<div class="card">
 
-    <div class="card">
+    <a id="openApp" class="button primary">
+        🚀 Добавить ключ в приложение
+    </a>
 
-        <a id="openApp" class="button primary">
-            🚀 Перенести ключ в приложение
-        </a>
-
-        <div class="small">
-            Если приложение не установлено — скачайте ниже
-        </div>
-
-        <a href="#" class="button">📱 Android</a>
-        <a href="#" class="button">🍏 iOS</a>
-        <a href="#" class="button">💻 ПК</a>
-
-        <a id="showKeyBtn" class="button">
-            🔑 Показать ключ
-        </a>
-
-        <div id="keyBlock" class="key hidden"></div>
-
+    <div class="small">
+        Если приложение не открылось — установите его ниже
     </div>
+
+    <a href="#" class="button">📱 Скачать для Android</a>
+    <a href="#" class="button">🍏 Скачать для iOS</a>
+    <a href="#" class="button">💻 Скачать для ПК</a>
+
+    <a id="copyBtn" class="button">
+        📋 Скопировать ключ вручную
+    </a>
+
+    <div id="keyBlock" class="key hidden"></div>
 
 </div>
 
@@ -118,9 +121,8 @@ const params = new URLSearchParams(window.location.search);
 const key = params.get("key");
 
 const openBtn = document.getElementById("openApp");
-const fallback = document.getElementById("fallback");
 const keyBlock = document.getElementById("keyBlock");
-const showKeyBtn = document.getElementById("showKeyBtn");
+const copyBtn = document.getElementById("copyBtn");
 
 if (!key) {
     document.querySelector(".title").innerText = "Ошибка: ключ не найден";
@@ -128,17 +130,13 @@ if (!key) {
 
     openBtn.href = key;
 
-    // 🚀 ПЫТАЕМСЯ ОТКРЫТЬ ПРИЛОЖЕНИЕ СРАЗУ
+    // 🚀 пробуем открыть
     window.location.href = key;
 
-    // 👇 ЕСЛИ НЕ ОТКРЫЛОСЬ — ПОКАЗЫВАЕМ UI
-    setTimeout(() => {
-        fallback.classList.remove("hidden");
-    }, 1500);
-
-    // 👇 показать ключ вручную
-    showKeyBtn.onclick = () => {
-        keyBlock.innerText = key;
+    // 📋 копирование
+    copyBtn.onclick = () => {
+        navigator.clipboard.writeText(key);
+        keyBlock.innerText = "Скопировано: " + key;
         keyBlock.classList.remove("hidden");
     };
 }
