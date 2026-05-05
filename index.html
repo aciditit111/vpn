@@ -6,6 +6,10 @@
 <title>SELLPRIM VPN</title>
 
 <style>
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -31,6 +35,12 @@ body {
     padding: 18px;
     margin-bottom: 15px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    animation: fade 0.4s ease;
+}
+
+@keyframes fade {
+    from {opacity: 0; transform: translateY(10px);}
+    to {opacity: 1; transform: translateY(0);}
 }
 
 .button {
@@ -44,11 +54,17 @@ body {
     text-decoration: none;
     color: black;
     background: #e9e9ed;
+    cursor: pointer;
     transition: 0.2s;
 }
 
 .button:hover {
     background: #dcdce0;
+    transform: scale(1.02);
+}
+
+.button:active {
+    transform: scale(0.97);
 }
 
 .primary {
@@ -78,96 +94,91 @@ body {
 
 <div class="title">⚡ SELLPRIM VPN</div>
 
-<div class="card" id="mainCard">
-    <b>🔑 Перенос ключа в приложение</b>
+<div class="card">
+    <b id="mainTitle">🔑 Перенос ключа в приложение</b>
     <div class="small" id="status">Подключение...</div>
 </div>
 
 <div class="card" id="apps"></div>
 
 <div class="card">
-    <a id="copyBtn" class="button">📋 Скопировать ключ вручную</a>
+    <div id="copyBtn" class="button">📋 Скопировать ключ вручную</div>
 </div>
 
 </div>
 
 <script>
 
-// === ПОЛУЧАЕМ КЛЮЧ ===
+// ключ
 const params = new URLSearchParams(window.location.search);
 const key = params.get("key");
 
-// === ДЕТЕКТ УСТРОЙСТВА ===
+// детект
 const ua = navigator.userAgent;
 let device = "pc";
 
 if (/iPhone|iPad/i.test(ua)) device = "ios";
 if (/Android/i.test(ua)) device = "android";
 
-// === ССЫЛКИ ===
+// ссылки
 const links = {
     android: "https://play.google.com/store/apps/details?id=com.v2ray.ang",
     ios: "https://apps.apple.com/app/id6450534064",
     pc: "https://github.com/FuriousVPN/Furious/releases/latest"
 };
 
-// === ВЫВОД КНОПОК ===
+// рендер
 function renderButtons() {
 
     const container = document.getElementById("apps");
 
-    let topButton = "";
-    let other = "";
+    let html = `<b>📥 Установите приложение</b>`;
 
-    function createBtn(text, link, extra="") {
+    function btn(text, link, extra="") {
         return `<a class="button ${extra}" href="${link}" target="_blank">${text}</a>`;
     }
 
-    // верхняя кнопка (по устройству)
+    // верхняя кнопка
     if (device === "android") {
-        topButton = createBtn("📱 Скачать для Android", links.android, "detect");
+        html += btn("📱 Скачать для Android", links.android, "detect");
     } else if (device === "ios") {
-        topButton = createBtn("🍏 Скачать для iPhone", links.ios, "detect");
+        html += btn("🍏 Скачать для iPhone", links.ios, "detect");
     } else {
-        topButton = createBtn("💻 Скачать для ПК", links.pc, "detect");
+        html += btn("💻 Скачать для ПК", links.pc, "detect");
     }
 
-    // остальные
-    other += createBtn("📱 Скачать для Android", links.android);
-    other += createBtn("🍏 Скачать для iPhone", links.ios);
-    other += createBtn("💻 Скачать для ПК", links.pc);
+    html += `<div class="small">Рекомендуется для вашего устройства</div>`;
 
-    container.innerHTML = `
-        <b>📥 Установите приложение</b>
-        ${topButton}
-        <div class="small">Рекомендуется для вашего устройства</div>
-        ${other}
-    `;
+    // остальные БЕЗ ДУБЛЯ
+    if (device !== "android") html += btn("📱 Скачать для Android", links.android);
+    if (device !== "ios") html += btn("🍏 Скачать для iPhone", links.ios);
+    if (device !== "pc") html += btn("💻 Скачать для ПК", links.pc);
+
+    container.innerHTML = html;
 }
 
-// === КОПИРОВАНИЕ ===
+// копирование
 document.getElementById("copyBtn").onclick = () => {
     navigator.clipboard.writeText(key || "");
     alert("Скопировано");
 };
 
-// === АВТО ПЕРЕНОС ===
+// логика
 if (key) {
-
-    document.getElementById("status").innerText = "Пытаемся открыть приложение...";
 
     setTimeout(() => {
         window.location.href = key;
-    }, 500);
+    }, 400);
 
-    // fallback если не открылось
     setTimeout(() => {
-        document.getElementById("status").innerText = "Если не открылось — установите приложение ниже";
+        document.getElementById("mainTitle").innerText = "❌ Приложение не найдено";
+        document.getElementById("status").innerText = "Установите его ниже";
         renderButtons();
     }, 2500);
 
 } else {
-    document.getElementById("status").innerText = "Ошибка: ключ не найден";
+    document.getElementById("mainTitle").innerText = "Ошибка";
+    document.getElementById("status").innerText = "Ключ не найден";
     renderButtons();
 }
 
