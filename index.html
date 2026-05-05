@@ -9,8 +9,8 @@
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #0b1220;
-    color: #fff;
+    background: #0f172a;
+    color: white;
 }
 
 .container {
@@ -61,10 +61,16 @@ body {
     background: #16a34a;
 }
 
+.small {
+    font-size: 13px;
+    opacity: 0.7;
+    margin-top: 10px;
+}
+
 .key {
     background: #020617;
-    padding: 12px;
-    border-radius: 10px;
+    padding: 10px;
+    border-radius: 8px;
     font-size: 12px;
     word-break: break-all;
     margin-top: 10px;
@@ -72,12 +78,6 @@ body {
 
 .hidden {
     display: none;
-}
-
-.small {
-    font-size: 13px;
-    opacity: 0.7;
-    margin-top: 10px;
 }
 </style>
 </head>
@@ -89,7 +89,7 @@ body {
 <div class="title">⚡ SELLPRIM VPN</div>
 
 <div class="card">
-    🔑 Подключение к VPN...
+    🔑 Подключение...
 </div>
 
 <div class="card">
@@ -98,17 +98,17 @@ body {
         🚀 Добавить ключ в приложение
     </a>
 
-    <div class="small">
-        Если приложение не открылось — установите его ниже
+    <div id="installText" class="small">
+        Если приложение не открылось — установите ниже
     </div>
 
-    <a href="#" class="button">📱 Скачать для Android</a>
-    <a href="#" class="button">🍏 Скачать для iOS</a>
-    <a href="#" class="button">💻 Скачать для ПК</a>
+    <a id="mainDownload" class="button"></a>
 
-    <a id="copyBtn" class="button">
-        📋 Скопировать ключ вручную
-    </a>
+    <a id="androidBtn" class="button hidden">📱 Скачать для Android</a>
+    <a id="iosBtn" class="button hidden">🍏 Скачать для iOS</a>
+    <a id="pcBtn" class="button hidden">💻 Скачать для ПК</a>
+
+    <a id="copyBtn" class="button">📋 Скопировать ключ</a>
 
     <div id="keyBlock" class="key hidden"></div>
 
@@ -121,22 +121,85 @@ const params = new URLSearchParams(window.location.search);
 const key = params.get("key");
 
 const openBtn = document.getElementById("openApp");
-const keyBlock = document.getElementById("keyBlock");
 const copyBtn = document.getElementById("copyBtn");
+const keyBlock = document.getElementById("keyBlock");
 
+const mainDownload = document.getElementById("mainDownload");
+const androidBtn = document.getElementById("androidBtn");
+const iosBtn = document.getElementById("iosBtn");
+const pcBtn = document.getElementById("pcBtn");
+
+// 📱 реальные ссылки
+const ANDROID_LINK = "https://play.google.com/store/apps/details?id=com.v2ray.ang";
+const IOS_LINK = "https://apps.apple.com/app/id6450534064"; // v2ray / hiddify
+const PC_LINK = "https://github.com/FuriousVPN/Furious/releases";
+
+// 🧠 детект устройства
+const ua = navigator.userAgent.toLowerCase();
+
+let device = "pc";
+
+if (/iphone|ipad|ipod/.test(ua)) {
+    device = "ios";
+} else if (/android/.test(ua)) {
+    device = "android";
+}
+
+// 🎯 логика
 if (!key) {
     document.querySelector(".title").innerText = "Ошибка: ключ не найден";
 } else {
 
     openBtn.href = key;
 
-    // 🚀 пробуем открыть
+    // 🚀 авто открытие
     window.location.href = key;
+
+    // 👇 главная кнопка
+    if (device === "ios") {
+        mainDownload.innerText = "🍏 Скачать для iPhone";
+        mainDownload.href = IOS_LINK;
+
+        iosBtn.classList.remove("hidden");
+        iosBtn.href = IOS_LINK;
+
+        androidBtn.classList.remove("hidden");
+        androidBtn.href = ANDROID_LINK;
+
+        pcBtn.classList.remove("hidden");
+        pcBtn.href = PC_LINK;
+
+    } else if (device === "android") {
+        mainDownload.innerText = "📱 Скачать для Android";
+        mainDownload.href = ANDROID_LINK;
+
+        androidBtn.classList.remove("hidden");
+        androidBtn.href = ANDROID_LINK;
+
+        iosBtn.classList.remove("hidden");
+        iosBtn.href = IOS_LINK;
+
+        pcBtn.classList.remove("hidden");
+        pcBtn.href = PC_LINK;
+
+    } else {
+        mainDownload.innerText = "💻 Скачать для ПК";
+        mainDownload.href = PC_LINK;
+
+        pcBtn.classList.remove("hidden");
+        pcBtn.href = PC_LINK;
+
+        androidBtn.classList.remove("hidden");
+        androidBtn.href = ANDROID_LINK;
+
+        iosBtn.classList.remove("hidden");
+        iosBtn.href = IOS_LINK;
+    }
 
     // 📋 копирование
     copyBtn.onclick = () => {
         navigator.clipboard.writeText(key);
-        keyBlock.innerText = "Скопировано: " + key;
+        keyBlock.innerText = "Скопировано!";
         keyBlock.classList.remove("hidden");
     };
 }
