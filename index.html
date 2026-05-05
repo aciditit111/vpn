@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SELLPRIM VPN</title>
+
+<style>
+body {
+    background: #0f172a;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+    padding: 20px;
+}
+
+.box {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 20px;
+}
+
+.btn {
+    display: block;
+    background: #334155;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+}
+
+.key {
+    background: #020617;
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 15px;
+    font-family: monospace;
+    word-break: break-all;
+}
+</style>
+</head>
+
+<body>
+
+<h2>⚡ SELLPRIM VPN</h2>
+
+<div class="box">
+
+<p>👇 Нажми, чтобы подключиться</p>
+
+<div class="key" id="key"></div>
+
+<a class="btn" id="openApp">📲 Открыть в приложении</a>
+<a class="btn">📥 Скачать для Android</a>
+<a class="btn">💻 Скачать для ПК</a>
+
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const key = params.get("key");
+
+document.getElementById("key").innerText = key || "нет ключа";
+document.getElementById("openApp").href = key;
+</script>
+
+</body>
+</html>
