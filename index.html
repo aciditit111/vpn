@@ -3,21 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SELLPRIM VPN</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Inter', sans-serif;
     background: #f2f2f7;
 }
 
 .container {
-    max-width: 500px;
+    max-width: 480px;
     margin: auto;
     padding: 20px;
 }
@@ -25,65 +24,62 @@ body {
 .title {
     text-align: center;
     font-weight: 600;
-    font-size: 20px;
+    font-size: 18px;
     margin-bottom: 20px;
 }
 
 .card {
-    background: white;
+    background: #fff;
     border-radius: 16px;
     padding: 18px;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    animation: fade 0.4s ease;
-}
-
-@keyframes fade {
-    from {opacity: 0; transform: translateY(10px);}
-    to {opacity: 1; transform: translateY(0);}
+    margin-bottom: 14px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
 }
 
 .button {
-    display: block;
     width: 100%;
     padding: 14px;
     border-radius: 12px;
-    text-align: center;
-    font-weight: 500;
-    margin-top: 10px;
-    text-decoration: none;
-    color: black;
     background: #e9e9ed;
+    font-weight: 500;
     cursor: pointer;
+    border: none;
+    margin-top: 10px;
     transition: 0.2s;
 }
 
 .button:hover {
-    background: #dcdce0;
-    transform: scale(1.02);
-}
-
-.button:active {
-    transform: scale(0.97);
+    background: #ddd;
 }
 
 .primary {
     background: #000;
-    color: white;
+    color: #fff;
 }
 
-.primary:hover {
-    background: #222;
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f4f4f6;
+    padding: 14px;
+    border-radius: 12px;
+    margin-top: 10px;
+    text-decoration: none;
+    color: black;
 }
 
-.detect {
-    border: 2px solid #000;
+.badge {
+    background: #e1e1e6;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
 }
 
 .small {
     font-size: 13px;
     color: #777;
-    margin-top: 8px;
+    margin-top: 6px;
 }
 </style>
 </head>
@@ -92,94 +88,80 @@ body {
 
 <div class="container">
 
-<div class="title">⚡ SELLPRIM VPN</div>
+<div class="title">SELLPRIM VPN</div>
 
 <div class="card">
-    <b id="mainTitle">🔑 Перенос ключа в приложение</b>
+    <b id="mainTitle">Перенос ключа в приложение</b>
     <div class="small" id="status">Подключение...</div>
 </div>
 
 <div class="card" id="apps"></div>
 
 <div class="card">
-    <div id="copyBtn" class="button">📋 Скопировать ключ вручную</div>
+    <div id="copyBtn" class="button">Скопировать ключ вручную</div>
+</div>
+
+<div class="card">
+    <div class="small">Показать ключ (если нужно скопировать вручную)</div>
 </div>
 
 </div>
 
 <script>
 
-// ключ
 const params = new URLSearchParams(window.location.search);
 const key = params.get("key");
 
-// детект
 const ua = navigator.userAgent;
 let device = "pc";
-
 if (/iPhone|iPad/i.test(ua)) device = "ios";
 if (/Android/i.test(ua)) device = "android";
 
-// ссылки
 const links = {
     android: "https://play.google.com/store/apps/details?id=com.v2ray.ang",
     ios: "https://apps.apple.com/app/id6450534064",
     pc: "https://github.com/FuriousVPN/Furious/releases/latest"
 };
 
-// рендер
-function renderButtons() {
+function render() {
+    let html = `<b>Установите приложение</b>`;
 
-    const container = document.getElementById("apps");
-
-    let html = `<b>📥 Установите приложение</b>`;
-
-    function btn(text, link, extra="") {
-        return `<a class="button ${extra}" href="${link}" target="_blank">${text}</a>`;
+    function row(name, link, tag, main=false) {
+        return `<a class="${main ? 'button primary' : 'row'}" href="${link}" target="_blank">
+            ${main ? name : `<span>${name}</span><span class="badge">${tag}</span>`}
+        </a>`;
     }
 
-    // верхняя кнопка
-    if (device === "android") {
-        html += btn("📱 Скачать для Android", links.android, "detect");
-    } else if (device === "ios") {
-        html += btn("🍏 Скачать для iPhone", links.ios, "detect");
-    } else {
-        html += btn("💻 Скачать для ПК", links.pc, "detect");
-    }
+    if (device === "android") html += row("Скачать для Android", links.android, "", true);
+    if (device === "ios") html += row("Скачать для iPhone", links.ios, "", true);
+    if (device === "pc") html += row("Скачать для ПК", links.pc, "", true);
 
     html += `<div class="small">Рекомендуется для вашего устройства</div>`;
 
-    // остальные БЕЗ ДУБЛЯ
-    if (device !== "android") html += btn("📱 Скачать для Android", links.android);
-    if (device !== "ios") html += btn("🍏 Скачать для iPhone", links.ios);
-    if (device !== "pc") html += btn("💻 Скачать для ПК", links.pc);
+    if (device !== "android") html += row("Android", links.android, "Play");
+    if (device !== "ios") html += row("iOS", links.ios, "App");
+    if (device !== "pc") html += row("ПК", links.pc, "Download");
 
-    container.innerHTML = html;
+    document.getElementById("apps").innerHTML = html;
 }
 
-// копирование
 document.getElementById("copyBtn").onclick = () => {
     navigator.clipboard.writeText(key || "");
     alert("Скопировано");
 };
 
-// логика
 if (key) {
-
     setTimeout(() => {
         window.location.href = key;
     }, 400);
 
     setTimeout(() => {
-        document.getElementById("mainTitle").innerText = "❌ Приложение не найдено";
-        document.getElementById("status").innerText = "Установите его ниже";
-        renderButtons();
+        document.getElementById("mainTitle").innerText = "Приложение не найдено";
+        document.getElementById("status").innerText = "Установите его, выбрав вариант ниже";
+        render();
     }, 2500);
-
 } else {
-    document.getElementById("mainTitle").innerText = "Ошибка";
-    document.getElementById("status").innerText = "Ключ не найден";
-    renderButtons();
+    render();
 }
 
 </script>
