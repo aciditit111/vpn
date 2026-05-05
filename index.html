@@ -9,19 +9,19 @@
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #0f172a;
-    color: white;
+    background: #0b1220;
+    color: #fff;
 }
 
 .container {
-    max-width: 500px;
+    max-width: 420px;
     margin: 0 auto;
     padding: 20px;
 }
 
 .title {
     text-align: center;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
     margin-bottom: 20px;
 }
@@ -52,18 +52,23 @@ body {
     font-weight: 600;
 }
 
-.small {
-    opacity: 0.7;
-    font-size: 14px;
-    margin-top: 10px;
-}
-
 .key {
     background: #020617;
     padding: 12px;
     border-radius: 10px;
     font-size: 12px;
     word-break: break-all;
+    margin-top: 10px;
+    opacity: 0.7;
+}
+
+.hidden {
+    display: none;
+}
+
+.small {
+    font-size: 13px;
+    opacity: 0.7;
     margin-top: 10px;
 }
 </style>
@@ -76,20 +81,32 @@ body {
 <div class="title">⚡ SELLPRIM VPN</div>
 
 <div class="card">
-    👇 Нажми, чтобы подключиться
-    <div id="key" class="key">загрузка...</div>
+    🔑 Подключение...
+    <div id="key" class="key hidden"></div>
 </div>
 
-<div id="actions" style="display:none;">
+<div id="fallback" class="hidden">
 
     <div class="card">
-        <a id="openApp" class="button primary">🚀 Открыть VPN</a>
 
-        <div class="small">Если не открылось — установи приложение</div>
+        <a id="openApp" class="button primary">
+            🚀 Перенести ключ в приложение
+        </a>
 
-        <a href="#" class="button">📱 Скачать для Android</a>
-        <a href="#" class="button">🍏 Скачать для iOS</a>
-        <a href="#" class="button">💻 Скачать для ПК</a>
+        <div class="small">
+            Если приложение не установлено — скачайте ниже
+        </div>
+
+        <a href="#" class="button">📱 Android</a>
+        <a href="#" class="button">🍏 iOS</a>
+        <a href="#" class="button">💻 ПК</a>
+
+        <a id="showKeyBtn" class="button">
+            🔑 Показать ключ
+        </a>
+
+        <div id="keyBlock" class="key hidden"></div>
+
     </div>
 
 </div>
@@ -100,25 +117,30 @@ body {
 const params = new URLSearchParams(window.location.search);
 const key = params.get("key");
 
-const keyBlock = document.getElementById("key");
 const openBtn = document.getElementById("openApp");
-const actions = document.getElementById("actions");
+const fallback = document.getElementById("fallback");
+const keyBlock = document.getElementById("keyBlock");
+const showKeyBtn = document.getElementById("showKeyBtn");
 
 if (!key) {
-    keyBlock.innerText = "Ошибка: ключ не найден";
+    document.querySelector(".title").innerText = "Ошибка: ключ не найден";
 } else {
-    keyBlock.innerText = key;
+
     openBtn.href = key;
 
-    // 🚀 пробуем открыть приложение
-    setTimeout(() => {
-        window.location.href = key;
-    }, 300);
+    // 🚀 ПЫТАЕМСЯ ОТКРЫТЬ ПРИЛОЖЕНИЕ СРАЗУ
+    window.location.href = key;
 
-    // 👇 если не открылось — показываем UI
+    // 👇 ЕСЛИ НЕ ОТКРЫЛОСЬ — ПОКАЗЫВАЕМ UI
     setTimeout(() => {
-        actions.style.display = "block";
-    }, 2000);
+        fallback.classList.remove("hidden");
+    }, 1500);
+
+    // 👇 показать ключ вручную
+    showKeyBtn.onclick = () => {
+        keyBlock.innerText = key;
+        keyBlock.classList.remove("hidden");
+    };
 }
 </script>
 
