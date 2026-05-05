@@ -117,7 +117,7 @@ body {
 <div class="card" id="apps"></div>
 
 <div class="card" id="copyCard" class="hidden">
-    <div id="copyBtn" class="button">Скопировать ключ вручную</div>
+    <div id="copyBtn" class="button">Скопировать ключ</div>
 </div>
 
 <div class="card">
@@ -135,11 +135,6 @@ const ua = navigator.userAgent;
 let device = "pc";
 if (/iPhone|iPad/i.test(ua)) device = "ios";
 if (/Android/i.test(ua)) device = "android";
-
-const appSchemes = {
-    android: "v2ray://import/",
-    ios: "v2raytun://import/url="
-};
 
 const links = {
     android: "https://play.google.com/store/apps/details?id=com.v2raytun.android&hl=ru",
@@ -192,34 +187,30 @@ function tryImportKey() {
         return;
     }
 
-    // Попытка импорта в зависимости от устройства
-    if (device === "android") {
-        // Для Android v2raytun
-        const scheme = `v2raytun://import/url=${encodeURIComponent(key)}`;
-        window.location.href = scheme;
+    if (device === "android" || device === "ios") {
+        // Используем правильную схему v2raytun://import/{data}
+        const deepLink = `v2raytun://import/${encodeURIComponent(key)}`;
+        window.location.href = deepLink;
         
         setTimeout(() => {
-            document.getElementById("mainTitle").innerText = "Приложение не найдено";
-            document.getElementById("status").innerText = "Установите его, выбрав вариант ниже";
-            document.getElementById("copyCard").classList.remove("hidden");
+            document.getElementById("mainTitle").innerText = "✓ Ключ отправлен!";
+            document.getElementById("status").innerText = "Приложение v2RayTun откроется и добавит конфигурацию";
+            document.getElementById("copyCard").classList.add("hidden");
             render();
-        }, 2500);
-    } else if (device === "ios") {
-        // Для iOS v2RayTun
-        const scheme = `v2raytun://import?url=${encodeURIComponent(key)}`;
-        window.location.href = scheme;
-        
-        setTimeout(() => {
-            document.getElementById("mainTitle").innerText = "Приложение не найдено";
-            document.getElementById("status").innerText = "Установите его, выбрав вариант ниже";
-            document.getElementById("copyCard").classList.remove("hidden");
-            render();
-        }, 2500);
+        }, 1500);
     } else {
-        // Для ПК просто показываем ключ
-        document.getElementById("mainTitle").innerText = "Ваш ключ готов";
-        document.getElementById("status").innerText = "Скопируйте ключ и добавьте его в v2rayN";
-        document.getElementById("copyCard").classList.remove("hidden");
+        // Для ПК копируем в буфер обмена
+        navigator.clipboard.writeText(key).then(() => {
+            document.getElementById("mainTitle").innerText = "✓ Ключ скопирован!";
+            document.getElementById("status").innerText = "Вставьте в v2rayN: Ctrl+V";
+            document.getElementById("copyCard").classList.add("hidden");
+            render();
+        }).catch(() => {
+            document.getElementById("mainTitle").innerText = "Ваш ключ";
+            document.getElementById("status").innerText = "Скопируйте и добавьте в v2rayN";
+            document.getElementById("copyCard").classList.remove("hidden");
+            render();
+        });
     }
 }
 
